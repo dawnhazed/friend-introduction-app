@@ -37,91 +37,99 @@ struct ContentView: View {
     
     
     var body: some View {
-        ZStack{ // depth stack (layers)
-            
-            TimelineView(.animation){
-                context in
-                let s = context.date.timeIntervalSince1970
-                let v = Float(sin(s)) / 4
+        
+        NavigationStack {
+            ZStack{ // depth stack (layers)
                 
-                
-                MeshGradient(
-                    width: 3, // number of colors per row
-                    height: 3, // number of colors per column
-                    points: [ // sesuaikan dengan width and height jumlah pointsnya, [x, y]
-                        [0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
-                        [0.0, 0.5], [0.5 + v, 0.5 - v], [1.0, 0.3 - v],
-                        [0.0, 1.0], [0.7 - v, 1.0], [1.0, 1.0],
-                    ],
-                    colors: [ // color sesuai sama points
-                        .softLavender,  .paleSkyBlue,   isActive ? .blushPink : .mintGreen,
-                        .dustyRose,     .peachCream,    .babyBlue,
-                        isActive ? .peachCream : .lilacMist,    .seafoamPastel, .blushPink
-                    ]
+                TimelineView(.animation){
+                    context in
+                    let s = context.date.timeIntervalSince1970
+                    let v = Float(sin(s)) / 4
                     
-                )
-            }
-            .ignoresSafeArea()
-            .onAppear {
-                    withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
-                    isActive = true
+                    
+                    MeshGradient(
+                        width: 3, // number of colors per row
+                        height: 3, // number of colors per column
+                        points: [ // sesuaikan dengan width and height jumlah pointsnya, [x, y]
+                            [0.0, 0.0], [0.5, 0.0],         [1.0, 0.0],
+                            [0.0, 0.5], [0.5 + v, 0.5 - v], [1.0, 0.3 - v],
+                            [0.0, 1.0], [0.7 - v, 1.0],     [1.0, 1.0],
+                        ],
+                        colors: [ // color sesuai sama points
+                            .softLavender,  .paleSkyBlue,   isActive ? .blushPink : .mintGreen,
+                            .dustyRose,     .peachCream,    .babyBlue,
+                            isActive ? .peachCream : .lilacMist,    .seafoamPastel, .blushPink
+                        ]
+                        
+                    )
                 }
-            }
-            
-            RoundedRectangle(cornerRadius: 10)
-                .foregroundStyle(.white)
-                .frame(width: 340, height: 320)
-                .shadow(radius: 3)
-           
-            
-            VStack {
-                GroupBox {
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text("introducing".uppercased())
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundColor(.gray)
-                            Text("Euginia Gabrielle")
-                                .font(.title)
-                                .fontWeight(.bold)
-                        }
-                        
-                        Spacer()
-                        
-                        Image("profilePicture")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 55, height: 55)
-                            .clipShape(Circle())
+                .ignoresSafeArea()
+                .onAppear {
+                        withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                        isActive = true
                     }
-                    .padding([.bottom], 20)
-                    
-                    VStack(alignment: .leading) {
-                        ForEach(personInfo.indices, id: \.self) { index in
-                            //personInfo.indices -> gives us the range of indices in the personInfo array (0, 1, 2, etc.)
-                            //id: \.self -> gives swiftUI a way to uniquely identify each element, in this case, using .self which is using they're own array index
-                            InfoRow(label: personInfo[index].label,
-                                value: personInfo[index].value)
-                            // for each iteration, create an InfoRow sesuai dengan index
-                                if index < personInfo.count - 1 { // Adds a divider after every item kecuali item terakhir
-                                    Divider()
+                }
+                
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundStyle(.white)
+                    .frame(width: 340, height: 320)
+                    .shadow(radius: 3)
+               
+                
+                VStack {
+                    NavigationLink(destination: CarouselView()) {
+                        GroupBox {
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text("introducing".uppercased())
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.gray)
+                                    Text("Euginia Gabrielle")
+                                        .font(.title)
+                                        .fontWeight(.bold)
                                 }
+                                
+                                Spacer()
+                                
+                                Image("profilePicture")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 55, height: 55)
+                                    .clipShape(Circle())
+                            }
+                            .padding([.bottom], 20)
+                            
+                            VStack(alignment: .leading) {
+                                ForEach(personInfo.indices, id: \.self) { index in
+                                    //personInfo.indices -> gives us the range of indices in the personInfo array (0, 1, 2, etc.)
+                                    //id: \.self -> gives swiftUI a way to uniquely identify each element, in this case, using .self which is using they're own array index
+                                    InfoRow(label: personInfo[index].label,
+                                        value: personInfo[index].value)
+                                    // for each iteration, create an InfoRow sesuai dengan index
+                                        if index < personInfo.count - 1 { // Adds a divider after every item kecuali item terakhir
+                                            Divider()
+                                        }
+                                }
+                            }
+                            
                         }
                     }
-                    
+                    .padding(30)
+                    .frame(width: 400)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        isTapped.toggle()
+                        print("Just tapped")
+                        
+                    }
                 }
-                .padding(30)
-                .frame(width: 400)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    isTapped.toggle()
-                    print("Just tapped")
-                }
+                
+                .foregroundColor(.primary)
+                
             }
-            
-            
         }
+        
         
     }
     
